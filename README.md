@@ -8,6 +8,10 @@ Stockpot is an AI-powered food cost and purchasing platform built specifically f
 
 Meet **Nonna** — Stockpot's built-in AI assistant. She watches your numbers, alerts you when something's wrong, and gives you plain-language advice in your language, on your schedule.
 
+<p align="center">
+  <img src="docs/nonna.png" alt="Nonna — Stockpot's AI Assistant" width="200"/>
+</p>
+
 ---
 
 ## What Stockpot does
@@ -68,13 +72,19 @@ Available in the free tier. Gets smarter as you connect more data sources.
 
 | Layer | Status |
 |---|---|
-| Backend — FastAPI | 🔧 In Progress |
 | Database — Supabase/PostgreSQL | ✅ Complete |
 | Auth — Register, Login, JWT | ✅ Complete |
-| Menu & Recipe Builder | 🔧 In Progress |
-| Smart Purchasing | Planned |
-| Waste Tracking | Planned |
-| Nonna AI | Planned |
+| Ingredients — CRUD, allergens, barcode lookup | ✅ Complete |
+| Menu & Recipe Builder — food cost, margins, allergens | ✅ Complete |
+| Waste Log — cost tracking, patterns, summary | ✅ Complete |
+| Nonna AI — chat, onboarding, proactive alerts | ✅ Complete |
+| Vision — menu photo extraction, invoice scanning | ✅ Complete |
+| Vendor Management — contacts, orders, delivery, price history | ✅ Complete |
+| Inventory Counts | 🔧 In Progress |
+| Purchasing Forecast | Planned |
+| Dashboard Aggregator | Planned |
+| Reports & PDF Export | Planned |
+| Square POS Integration | Planned |
 | React Frontend | Planned |
 | Mobile — Capacitor | Planned |
 
@@ -98,6 +108,20 @@ uvicorn api.main:app --reload --port 8000
 ```
 
 API docs available at `http://localhost:8000/docs`
+
+---
+
+## API endpoints
+
+| Router | Endpoints |
+|---|---|
+| `/auth` | register, login, logout |
+| `/ingredients` | CRUD, barcode lookup, allergen tracking |
+| `/menu` | CRUD, recipe builder, food cost, margin indicator |
+| `/waste` | log entry, summary, pattern data |
+| `/nonna` | chat, onboarding, proactive alerts |
+| `/scanning` | menu photo extraction, invoice scanning |
+| `/vendors` | contacts, orders, delivery tracking, price history |
 
 ---
 
