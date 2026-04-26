@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.config import get_settings
-from api.routers import auth, menu, ingredients, waste, nonna
+from api.routers import auth, menu, ingredients, waste, nonna, scanning
 
 settings = get_settings()
 
@@ -25,6 +25,7 @@ app.include_router(menu.router)
 app.include_router(ingredients.router)
 app.include_router(waste.router)
 app.include_router(nonna.router)
+app.include_router(scanning.router)
 
 @app.get("/")
 def root():
