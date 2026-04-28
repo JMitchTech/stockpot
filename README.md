@@ -80,10 +80,10 @@ Available in the free tier. Gets smarter as you connect more data sources.
 | Nonna AI — chat, onboarding, proactive alerts | ✅ Complete |
 | Vision — menu photo extraction, invoice scanning | ✅ Complete |
 | Vendor Management — contacts, orders, delivery, price history | ✅ Complete |
-| Inventory Counts | 🔧 In Progress |
-| Purchasing Forecast | Planned |
-| Dashboard Aggregator | Planned |
-| Reports & PDF Export | Planned |
+| Inventory Counts — variance tracking, shrinkage report | ✅ Complete |
+| Purchasing Forecast — event-aware, waste-buffered order list | ✅ Complete |
+| Dashboard Aggregator — health score, alerts, full snapshot | ✅ Complete |
+| Reports & PDF Export | 🔧 In Progress |
 | Square POS Integration | Planned |
 | React Frontend | Planned |
 | Mobile — Capacitor | Planned |
@@ -122,6 +122,9 @@ API docs available at `http://localhost:8000/docs`
 | `/nonna` | chat, onboarding, proactive alerts |
 | `/scanning` | menu photo extraction, invoice scanning |
 | `/vendors` | contacts, orders, delivery tracking, price history |
+| `/inventory` | bulk counts, variance report, shrinkage tracking |
+| `/purchasing` | smart forecast, event management, order summaries |
+| `/dashboard` | health score, full operational snapshot, alert engine |
 
 ---
 
