@@ -10,6 +10,12 @@ class Settings(BaseSettings):
     # Anthropic
     anthropic_api_key: str
 
+    # Square
+    square_access_token: str = ""
+    square_application_id: str = ""
+    square_environment: str = "sandbox"
+    square_webhook_signature_key: str = ""
+
     # App
     app_env: str = "development"
     secret_key: str
