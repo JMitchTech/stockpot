@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import api from '../api'
-import nonna from '../assets/Nonna.png'
+import nonna from '../assets/nonnaicon.png'
 
 export default function NonnaSidebar({ open, onClose }) {
   const [messages, setMessages] = useState([
@@ -140,8 +140,8 @@ export default function NonnaSidebar({ open, onClose }) {
                   src={nonna}
                   alt="Nonna"
                   style={{
-                    width: '28px',
-                    height: '28px',
+                    width: '50px',
+                    height: '50px',
                     borderRadius: '50%',
                     objectFit: 'cover',
                     flexShrink: 0,
@@ -169,7 +169,7 @@ export default function NonnaSidebar({ open, onClose }) {
               <img
                 src={nonna}
                 alt="Nonna"
-                style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }}
+                style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover' }}
               />
               <div
                 style={{
