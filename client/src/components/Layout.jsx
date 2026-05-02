@@ -37,7 +37,7 @@ export default function Layout({ children }) {
         }}
       >
         <div className="px-6 py-3 flex items-center justify-between">
-          <img src={logo} alt="Stockpot" className="h-9" />
+          <img src={logo} alt="Stockpot" className="h-14" />
           <div className="flex items-center gap-4">
             <span className="text-sm" style={{ color: '#6B4F3A' }}>
               {user.email}
