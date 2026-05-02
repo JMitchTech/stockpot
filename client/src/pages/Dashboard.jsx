@@ -9,8 +9,7 @@ import api from '../api'
 export default function Dashboard() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [nonnaOpen, setNonnaOpen] = useState(false)
-
+  
   useEffect(() => {
     api.get('/dashboard/')
       .then(res => setData(res.data))
@@ -152,17 +151,6 @@ export default function Dashboard() {
         </div>
 
       </div>
-
-      {/* Nonna floating button */}
-      <button
-        onClick={() => setNonnaOpen(true)}
-        className="fixed bottom-0 left-0 w-52 flex flex-col items-center pb-4 hover:scale-105 transition-transform"
-      >
-        <img src="/src/assets/Nonna.png" alt="Ask Nonna" className="w-36 h-36 object-contain drop-shadow-lg" />
-        <span className="text-xs mt-1" style={{ color: '#6B4F3A' }}>Ask Nonna</span>
-      </button>
-
-      <NonnaSidebar open={nonnaOpen} onClose={() => setNonnaOpen(false)} />
 
     </Layout>
   )

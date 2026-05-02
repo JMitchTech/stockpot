@@ -1,5 +1,8 @@
+import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import logo from '../assets/logo1.png'
+import nonna from '../assets/Nonna.png'
+import NonnaSidebar from './Nonna'
 
 const navItems = [
   { path: '/', label: 'Dashboard' },
@@ -14,6 +17,7 @@ const navItems = [
 export default function Layout({ children }) {
   const navigate = useNavigate()
   const user = JSON.parse(localStorage.getItem('stockpot_user') || '{}')
+  const [nonnaOpen, setNonnaOpen] = useState(false)
 
   const handleLogout = () => {
     localStorage.removeItem('stockpot_token')
@@ -33,7 +37,7 @@ export default function Layout({ children }) {
         }}
       >
         <div className="px-6 py-3 flex items-center justify-between">
-          <img src={logo} alt="Stockpot" className="h-15" />
+          <img src={logo} alt="Stockpot" className="h-9" />
           <div className="flex items-center gap-4">
             <span className="text-sm" style={{ color: '#6B4F3A' }}>
               {user.email}
@@ -49,17 +53,18 @@ export default function Layout({ children }) {
         </div>
       </header>
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 overflow-hidden">
 
         {/* Sidebar */}
         <aside
-          className="w-52 flex flex-col pt-6 shrink-0"
+          className="w-52 flex flex-col shrink-0 h-full overflow-hidden"
           style={{
             backgroundColor: '#F5ECD7',
             borderRight: '1px solid #E8D5B7'
           }}
         >
-          <nav className="flex flex-col gap-1 px-3">
+          {/* Nav links */}
+          <nav className="flex flex-col gap-1 px-3 pt-6 overflow-y-auto flex-1">
             {navItems.map((item) => (
               <NavLink
                 key={item.path}
@@ -67,9 +72,7 @@ export default function Layout({ children }) {
                 end={item.path === '/'}
                 className={({ isActive }) =>
                   `px-4 py-2.5 rounded-lg text-sm font-medium transition ${
-                    isActive
-                      ? 'text-white'
-                      : 'hover:bg-amber-100'
+                    isActive ? 'text-white' : 'hover:bg-amber-100'
                   }`
                 }
                 style={({ isActive }) => ({
@@ -81,6 +84,22 @@ export default function Layout({ children }) {
               </NavLink>
             ))}
           </nav>
+
+          {/* Nonna at bottom of sidebar */}
+          <button
+            onClick={() => setNonnaOpen(true)}
+            className="flex flex-col items-center pb-4 pt-2 hover:scale-105 transition-transform"
+            style={{ marginLeft: '-12px' }}
+          >
+            <img
+              src={nonna}
+              alt="Ask Nonna"
+              className="w-36 h-36 object-contain drop-shadow-lg"
+            />
+            <span className="text-xs mt-1" style={{ color: '#6B4F3A' }}>
+              Ask Nonna
+            </span>
+          </button>
         </aside>
 
         {/* Main content */}
@@ -89,6 +108,10 @@ export default function Layout({ children }) {
         </main>
 
       </div>
+
+      {/* Nonna chat panel */}
+      <NonnaSidebar open={nonnaOpen} onClose={() => setNonnaOpen(false)} />
+
     </div>
   )
 }
