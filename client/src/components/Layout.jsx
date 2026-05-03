@@ -95,7 +95,7 @@ export default function Layout({ children }) {
             <img
               src={nonna}
               alt="Ask Nonna"
-              className="w-36 h-36 object-contain drop-shadow-lg"
+              className="w-50 h-50 object-contain drop-shadow-lg"
             />
             <span className="text-xs mt-1" style={{ color: '#6B4F3A' }}>
               Ask Nonna

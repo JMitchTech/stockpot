@@ -75,10 +75,12 @@ export default function NonnaSidebar({ open, onClose }) {
           top: '50%',
           transform: 'translateY(-13%)',
           backgroundColor: '#FEFAF4',
-          boxShadow: '-4px 0 24px rgba(0,0,0,0.15)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
           display: 'flex',
           flexDirection: 'column',
-          zIndex: 100000
+          zIndex: 100000,
+          borderRadius: '16px',
+          overflow: 'hidden'
         }}
       >
         {/* Header */}
