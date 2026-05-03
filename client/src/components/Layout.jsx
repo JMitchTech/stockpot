@@ -11,6 +11,7 @@ const navItems = [
   { path: '/waste', label: 'Waste Log' },
   { path: '/purchasing', label: 'Purchasing' },
   { path: '/vendors', label: 'Vendors' },
+  { path: '/scan', label: 'Scan Menu' },
   { path: '/reports', label: 'Reports' },
 ]
 

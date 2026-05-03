@@ -8,6 +8,7 @@ import Waste from './pages/Waste'
 import Purchasing from './pages/Purchasing'
 import Vendors from './pages/Vendors'
 import Reports from './pages/Reports'
+import Scan from './pages/Scan'
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem('stockpot_token')
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/waste" element={<PrivateRoute><Waste /></PrivateRoute>} />
         <Route path="/purchasing" element={<PrivateRoute><Purchasing /></PrivateRoute>} />
         <Route path="/vendors" element={<PrivateRoute><Vendors /></PrivateRoute>} />
+        <Route path="/scan" element={<PrivateRoute><Scan /></PrivateRoute>} />
         <Route path="/reports" element={<PrivateRoute><Reports /></PrivateRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
