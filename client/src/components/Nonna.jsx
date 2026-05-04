@@ -3,11 +3,13 @@ import { createPortal } from 'react-dom'
 import api from '../api'
 import nonna from '../assets/nonnaicon.png'
 
-export default function NonnaSidebar({ open, onClose }) {
+export default function NonnaSidebar({ open, onClose, onboarding = false }) {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: "Ciao! I'm Nonna. Ask me anything about your kitchen — food costs, waste, what to order, how your margins look. I'm here."
+      content: onboarding
+        ? "Benvenuto! Welcome to Stockpot! I'm Nonna, your kitchen assistant. I'm going to help you get set up. First — tell me, what kind of restaurant are you running?"
+        : "Ciao! I'm Nonna. Ask me anything about your kitchen — food costs, waste, what to order, how your margins look. I'm here."
     }
   ])
   const [input, setInput] = useState('')
@@ -27,7 +29,8 @@ export default function NonnaSidebar({ open, onClose }) {
     setLoading(true)
 
     try {
-      const res = await api.post('/nonna/chat', {
+      const endpoint = onboarding ? '/nonna/onboarding' : '/nonna/chat'
+      const res = await api.post(endpoint, {
         message: input,
         history: messages
       })
@@ -68,12 +71,10 @@ export default function NonnaSidebar({ open, onClose }) {
       <div
         style={{
           position: 'fixed',
-          top: 0,
-          right: 0,
+          bottom: '24px',
+          right: '24px',
           width: '384px',
           height: '400px',
-          top: '50%',
-          transform: 'translateY(-13%)',
           backgroundColor: '#FEFAF4',
           boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
           display: 'flex',
@@ -94,10 +95,11 @@ export default function NonnaSidebar({ open, onClose }) {
             flexShrink: 0
           }}
         >
-          
           <div>
             <p style={{ color: 'white', fontWeight: 600, fontSize: '14px', margin: 0 }}>Nonna</p>
-            <p style={{ color: '#93C5FD', fontSize: '12px', margin: 0 }}>Your kitchen assistant</p>
+            <p style={{ color: '#93C5FD', fontSize: '12px', margin: 0 }}>
+              {onboarding ? 'Getting you set up' : 'Your kitchen assistant'}
+            </p>
           </div>
           <button
             onClick={onClose}
@@ -155,7 +157,9 @@ export default function NonnaSidebar({ open, onClose }) {
                 style={{
                   maxWidth: '75%',
                   padding: '10px 14px',
-                  borderRadius: msg.role === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+                  borderRadius: msg.role === 'user'
+                    ? '18px 18px 4px 18px'
+                    : '18px 18px 18px 4px',
                   backgroundColor: msg.role === 'user' ? '#1B2A4A' : '#F0E6D3',
                   color: msg.role === 'user' ? 'white' : '#3D2B1F',
                   fontSize: '14px',
@@ -171,7 +175,12 @@ export default function NonnaSidebar({ open, onClose }) {
               <img
                 src={nonna}
                 alt="Nonna"
-                style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover' }}
+                style={{
+                  width: '50px',
+                  height: '50px',
+                  borderRadius: '50%',
+                  objectFit: 'cover'
+                }}
               />
               <div
                 style={{
@@ -206,7 +215,7 @@ export default function NonnaSidebar({ open, onClose }) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-            placeholder="Ask Nonna anything..."
+            placeholder={onboarding ? "Tell Nonna about your restaurant..." : "Ask Nonna anything..."}
             style={{
               flex: 1,
               fontSize: '14px',

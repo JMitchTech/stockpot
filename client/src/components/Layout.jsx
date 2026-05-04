@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import logo from '../assets/logo1.png'
 import nonna from '../assets/Nonna.png'
 import NonnaSidebar from './Nonna'
+import NonnaTour from './NonnaTour'
 
 const navItems = [
   { path: '/', label: 'Dashboard' },
@@ -19,6 +20,16 @@ export default function Layout({ children }) {
   const navigate = useNavigate()
   const user = JSON.parse(localStorage.getItem('stockpot_user') || '{}')
   const [nonnaOpen, setNonnaOpen] = useState(false)
+  const [isOnboarding, setIsOnboarding] = useState(false)
+  const [showTour, setShowTour] = useState(false)
+
+  useEffect(() => {
+    const handler = () => {
+      setShowTour(true)
+    }
+    window.addEventListener('open-nonna-onboarding', handler)
+    return () => window.removeEventListener('open-nonna-onboarding', handler)
+  }, [])
 
   const handleLogout = () => {
     localStorage.removeItem('stockpot_token')
@@ -27,7 +38,10 @@ export default function Layout({ children }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#FDF6EC' }}>
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ backgroundColor: '#FDF6EC' }}
+    >
 
       {/* Header */}
       <header
@@ -38,7 +52,7 @@ export default function Layout({ children }) {
         }}
       >
         <div className="px-6 py-3 flex items-center justify-between">
-          <img src={logo} alt="Stockpot" className="h-14" />
+          <img src={logo} alt="Stockpot" className="h-9" />
           <div className="flex items-center gap-4">
             <span className="text-sm" style={{ color: '#6B4F3A' }}>
               {user.email}
@@ -88,8 +102,11 @@ export default function Layout({ children }) {
 
           {/* Nonna at bottom of sidebar */}
           <button
-            onClick={() => setNonnaOpen(true)}
-            className="flex flex-col items-center pb-4 pt-2 hover:scale-105 transition-transform"
+            onClick={() => {
+              setIsOnboarding(false)
+              setNonnaOpen(true)
+            }}
+            className="flex flex-col items-center py-4 hover:scale-105 transition-transform"
             style={{ marginLeft: '-12px' }}
           >
             <img
@@ -111,7 +128,19 @@ export default function Layout({ children }) {
       </div>
 
       {/* Nonna chat panel */}
-      <NonnaSidebar open={nonnaOpen} onClose={() => setNonnaOpen(false)} />
+      <NonnaSidebar
+        open={nonnaOpen}
+        onClose={() => {
+          setNonnaOpen(false)
+          setIsOnboarding(false)
+        }}
+        onboarding={isOnboarding}
+      />
+
+      {/* Nonna guided tour */}
+      {showTour && (
+        <NonnaTour onComplete={() => setShowTour(false)} />
+      )}
 
     </div>
   )
