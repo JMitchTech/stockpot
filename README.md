@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo1.png" alt="Stockpot — Cook with passion. Manage with clarity." width="700"/>
+  <img src="logo2.png" alt="Stockpot — Cook with passion. Manage with clarity." width="700"/>
 </p>
 
 ---
