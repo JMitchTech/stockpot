@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import nonna from '../assets/Nonna.png'
 
@@ -53,6 +53,13 @@ const stops = [
   }
 ]
 
+function getTabOffset(label) {
+  const tabs = ['Dashboard', 'Menu', 'Ingredients', 'Waste Log', 'Purchasing', 'Vendors', 'Scan Menu', 'Reports']
+  const index = tabs.indexOf(label)
+  if (index === -1) return '24px'
+  return `${129 + index * 44}px`
+}
+
 export default function NonnaTour({ onComplete }) {
   const [step, setStep] = useState(0)
   const [visible, setVisible] = useState(true)
@@ -75,6 +82,15 @@ export default function NonnaTour({ onComplete }) {
     }, 200)
   }
 
+  const handleBack = () => {
+    if (animating) return
+    setAnimating(true)
+    setTimeout(() => {
+      setStep(step - 1)
+      setAnimating(false)
+    }, 200)
+  }
+
   if (!visible) return null
 
   return createPortal(
@@ -90,69 +106,67 @@ export default function NonnaTour({ onComplete }) {
         padding: '24px'
       }}
     >
-      {/* Highlight active sidebar tab */}
+      {/* Sidebar tab highlight */}
       {current.label && (
-  <div
-    style={{
-      position: 'fixed',
-      left: 0,
-      top: 0,
-      width: '208px',
-      height: '100vh',
-      zIndex: 99997,
-      pointerEvents: 'none'
-    }}
-  >
-    <div
-      style={{
-        position: 'absolute',
-        left: '12px',
-        right: '12px',
-        borderRadius: '8px',
-        backgroundColor: 'white',
-        border: '3px solid #C0392B',
-        top: getTabOffset(current.label),
-        height: '40px',
-        transition: 'top 0.3s ease',
-        display: 'flex',
-        alignItems: 'center',
-        paddingLeft: '16px'
-    }}
-    >
-      <span style={{ color: '#1B2A4A', fontSize: '14px', fontWeight: 600 }}>
-        {current.label}
-      </span>
-    </div>
-  </div>
-)}
+        <div
+          style={{
+            position: 'fixed',
+            left: 0,
+            top: 0,
+            width: '208px',
+            height: '100vh',
+            zIndex: 99997,
+            pointerEvents: 'none'
+          }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              left: '12px',
+              right: '12px',
+              borderRadius: '8px',
+              backgroundColor: 'white',
+              border: '3px solid #C0392B',
+              top: getTabOffset(current.label),
+              height: '45px',
+              transition: 'top 0.3s ease',
+              display: 'flex',
+              alignItems: 'center',
+              paddingLeft: '16px'
+            }}
+          >
+            <span style={{ color: '#1B2A4A', fontSize: '14px', fontWeight: 600 }}>
+              {current.label}
+            </span>
+          </div>
+        </div>
+      )}
 
-      {/* Main tour card */}
+      {/* Main tour card — Nonna stays still, only bubble animates */}
       <div
         style={{
           display: 'flex',
           alignItems: 'flex-end',
           gap: '32px',
           maxWidth: '860px',
-          width: '100%',
-          opacity: animating ? 0 : 1,
-          transition: 'opacity 0.2s ease'
+          width: '100%'
         }}
       >
-        {/* Nonna image */}
+        {/* Nonna image — static, no animation */}
         <div style={{ flexShrink: 0 }}>
           <img
             src={nonna}
             alt="Nonna"
             style={{
-              width: '350px',
-              height: '350px',
+              width: '360px',
+              height: '360px',
               objectFit: 'contain',
               filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.4))'
             }}
           />
         </div>
 
-        {/* Speech bubble */}
+        {/* Speech bubble — animates between steps */}
         <div
           style={{
             position: 'relative',
@@ -161,10 +175,12 @@ export default function NonnaTour({ onComplete }) {
             padding: '28px 32px',
             boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
             flex: 1,
-            marginBottom: '24px'
+            marginBottom: '24px',
+            opacity: animating ? 0 : 1,
+            transition: 'opacity 0.2s ease'
           }}
         >
-          {/* Bubble tail pointing left toward Nonna */}
+          {/* Bubble tail */}
           <div
             style={{
               position: 'absolute',
@@ -178,14 +194,8 @@ export default function NonnaTour({ onComplete }) {
             }}
           />
 
-          {/* Step indicator */}
-          <div
-            style={{
-              display: 'flex',
-              gap: '6px',
-              marginBottom: '16px'
-            }}
-          >
+          {/* Step dots */}
+          <div style={{ display: 'flex', gap: '6px', marginBottom: '16px' }}>
             {stops.map((_, i) => (
               <div
                 key={i}
@@ -233,7 +243,7 @@ export default function NonnaTour({ onComplete }) {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             {step > 0 ? (
               <button
-                onClick={() => setStep(step - 1)}
+                onClick={handleBack}
                 style={{
                   fontSize: '13px',
                   color: '#6B4F3A',
@@ -269,11 +279,4 @@ export default function NonnaTour({ onComplete }) {
     </div>,
     document.body
   )
-}
-
-function getTabOffset(label) {
-  const tabs = ['Dashboard', 'Menu', 'Ingredients', 'Waste Log', 'Purchasing', 'Vendors', 'Scan Menu', 'Reports']
-  const index = tabs.indexOf(label)
-  if (index === -1) return '24px'
-  return `${85 + index * 44}px`
 }

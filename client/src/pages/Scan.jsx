@@ -10,15 +10,23 @@ export default function Scan() {
   const [results, setResults] = useState(null)
   const [importing, setImporting] = useState(false)
   const [imported, setImported] = useState(false)
+  const [ingredientCount, setIngredientCount] = useState(0)
   const fileRef = useRef(null)
   const cameraRef = useRef(null)
+
+  const reset = () => {
+    setFile(null)
+    setPreview(null)
+    setResults(null)
+    setImported(false)
+    setIngredientCount(0)
+  }
 
   const handleFileChange = (e) => {
     const selected = e.target.files[0]
     if (!selected) return
+    reset()
     setFile(selected)
-    setResults(null)
-    setImported(false)
     const reader = new FileReader()
     reader.onload = () => setPreview(reader.result)
     reader.readAsDataURL(selected)
@@ -46,21 +54,56 @@ export default function Scan() {
   const handleImportAll = async () => {
     if (!results?.items) return
     setImporting(true)
+
+    // Get existing ingredients to avoid duplicates
+    let existingIngredients = []
     try {
-      for (const item of results.items) {
+      const res = await api.get('/ingredients/')
+      existingIngredients = res.data.map(i => i.name.toLowerCase())
+    } catch {}
+
+    // Collect all unique ingredient names across all dishes
+    const allIngredients = new Set()
+    for (const item of results.items) {
+      if (item.potential_ingredients) {
+        item.potential_ingredients.forEach(ing => {
+          allIngredients.add(ing.trim().toLowerCase())
+        })
+      }
+    }
+
+    // Import dishes
+    for (const item of results.items) {
+      try {
         await api.post('/menu/', {
           name: item.name,
           category: item.category || '',
           sale_price: item.price || 0,
           recipe_lines: []
         })
-      }
-      setImported(true)
-    } catch (err) {
-      alert('Some items failed to import')
-    } finally {
-      setImporting(false)
+      } catch {}
     }
+
+    // Import ingredients — skip duplicates
+    let count = 0
+    const toImport = [...allIngredients].filter(name => !existingIngredients.includes(name))
+    for (const name of toImport) {
+      try {
+        await api.post('/ingredients/', {
+          name: name.charAt(0).toUpperCase() + name.slice(1),
+          unit: 'unit',
+          cost_per_unit: 0.00,
+          par_level: 0,
+          current_stock: 0,
+          allergens: []
+        })
+        count++
+      } catch {}
+    }
+
+    setIngredientCount(count)
+    setImported(true)
+    setImporting(false)
   }
 
   return (
@@ -80,7 +123,7 @@ export default function Scan() {
           {['menu', 'invoice'].map(m => (
             <button
               key={m}
-              onClick={() => { setMode(m); setResults(null); setFile(null); setPreview(null); setImported(false) }}
+              onClick={() => { setMode(m); reset() }}
               className="px-5 py-2 rounded-lg text-sm font-medium transition"
               style={{
                 backgroundColor: mode === m ? '#1B2A4A' : '#FEFAF4',
@@ -106,7 +149,7 @@ export default function Scan() {
                 className="max-h-64 mx-auto rounded-xl object-contain shadow"
               />
               <button
-                onClick={() => { setFile(null); setPreview(null); setResults(null); setImported(false) }}
+                onClick={reset}
                 className="text-xs underline"
                 style={{ color: '#C0392B' }}
               >
@@ -122,9 +165,7 @@ export default function Scan() {
               <p className="text-sm" style={{ color: '#6B4F3A' }}>
                 On mobile you can take a photo directly. On desktop upload an image file.
               </p>
-
               <div className="flex justify-center gap-3">
-                {/* File upload */}
                 <button
                   onClick={() => fileRef.current.click()}
                   className="text-sm px-5 py-2 rounded-lg transition"
@@ -132,8 +173,6 @@ export default function Scan() {
                 >
                   Choose File
                 </button>
-
-                {/* Camera — works on mobile */}
                 <button
                   onClick={() => cameraRef.current.click()}
                   className="text-sm px-5 py-2 rounded-lg transition"
@@ -142,14 +181,11 @@ export default function Scan() {
                   Take Photo
                 </button>
               </div>
-
-              {/* Hidden inputs */}
               <input
                 ref={fileRef}
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
-                className="hidden"
                 style={{ display: 'none' }}
               />
               <input
@@ -158,7 +194,6 @@ export default function Scan() {
                 accept="image/*"
                 capture="environment"
                 onChange={handleFileChange}
-                className="hidden"
                 style={{ display: 'none' }}
               />
             </div>
@@ -184,39 +219,50 @@ export default function Scan() {
         {results && (
           <div className="space-y-4">
 
-            {/* Summary */}
+            {/* Summary + import button */}
             <div
-              className="px-5 py-4 rounded-2xl shadow-sm flex items-center justify-between"
+              className="px-5 py-4 rounded-2xl shadow-sm"
               style={{ backgroundColor: '#FEFAF4', border: '1px solid #E8D5B7' }}
             >
-              <div>
-                <p className="font-semibold text-sm" style={{ color: '#1B2A4A' }}>
-                  Nonna found {results.items_found} {mode === 'menu' ? 'dishes' : 'line items'}
-                </p>
-                {results.extraction_notes && (
-                  <p className="text-xs mt-0.5" style={{ color: '#6B4F3A' }}>
-                    {results.extraction_notes}
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div>
+                  <p className="font-semibold text-sm" style={{ color: '#1B2A4A' }}>
+                    Nonna found {results.items_found} {mode === 'menu' ? 'dishes' : 'line items'}
                   </p>
+                  {results.extraction_notes && (
+                    <p className="text-xs mt-0.5" style={{ color: '#6B4F3A' }}>
+                      {results.extraction_notes}
+                    </p>
+                  )}
+                </div>
+
+                {mode === 'menu' && results.items_found > 0 && (
+                  !imported ? (
+                    <button
+                      onClick={handleImportAll}
+                      disabled={importing}
+                      className="text-sm text-white px-4 py-2 rounded-lg disabled:opacity-50"
+                      style={{ backgroundColor: '#1B2A4A' }}
+                    >
+                      {importing ? 'Importing...' : 'Import to Stockpot'}
+                    </button>
+                  ) : (
+                    <span className="text-sm font-medium text-green-700 bg-green-50 px-3 py-2 rounded-lg">
+                      {results.items_found} dishes and {ingredientCount} ingredients imported
+                    </span>
+                  )
                 )}
               </div>
-              {mode === 'menu' && results.items_found > 0 && !imported && (
-                <button
-                  onClick={handleImportAll}
-                  disabled={importing}
-                  className="text-sm text-white px-4 py-2 rounded-lg disabled:opacity-50"
-                  style={{ backgroundColor: '#1B2A4A' }}
-                >
-                  {importing ? 'Importing...' : 'Import All'}
-                </button>
-              )}
-              {imported && (
-                <span className="text-sm font-medium text-green-700 bg-green-50 px-3 py-1 rounded-full">
-                  Imported to Menu
-                </span>
+
+              {/* Import note */}
+              {mode === 'menu' && !imported && (
+                <p className="text-xs mt-3 pt-3" style={{ color: '#6B4F3A', borderTop: '1px solid #E8D5B7' }}>
+                  Importing will add all dishes to your Menu and all detected ingredients to your Ingredients library with $0 cost. Visit Ingredients to fill in real costs so Nonna can calculate your food margins.
+                </p>
               )}
             </div>
 
-            {/* Item list */}
+            {/* Results table */}
             <div className="rounded-2xl overflow-hidden shadow-sm" style={{ border: '1px solid #E8D5B7' }}>
               <table className="w-full text-sm">
                 <thead>
@@ -226,7 +272,7 @@ export default function Scan() {
                         <th className="text-left px-5 py-3 font-semibold" style={{ color: '#1B2A4A' }}>Dish</th>
                         <th className="text-left px-5 py-3 font-semibold" style={{ color: '#1B2A4A' }}>Category</th>
                         <th className="text-left px-5 py-3 font-semibold" style={{ color: '#1B2A4A' }}>Price</th>
-                        <th className="text-left px-5 py-3 font-semibold" style={{ color: '#1B2A4A' }}>Ingredients Found</th>
+                        <th className="text-left px-5 py-3 font-semibold" style={{ color: '#1B2A4A' }}>Ingredients Detected</th>
                       </>
                     ) : (
                       <>
@@ -242,15 +288,20 @@ export default function Scan() {
                   {results.items.map((item, i) => (
                     <tr
                       key={i}
-                      style={{ backgroundColor: i % 2 === 0 ? '#FEFAF4' : '#FDF6EC', borderTop: '1px solid #E8D5B7' }}
+                      style={{
+                        backgroundColor: i % 2 === 0 ? '#FEFAF4' : '#FDF6EC',
+                        borderTop: '1px solid #E8D5B7'
+                      }}
                     >
                       {mode === 'menu' ? (
                         <>
                           <td className="px-5 py-3 font-medium" style={{ color: '#3D2B1F' }}>{item.name}</td>
                           <td className="px-5 py-3" style={{ color: '#6B4F3A' }}>{item.category || '—'}</td>
-                          <td className="px-5 py-3" style={{ color: '#3D2B1F' }}>${item.price?.toFixed(2) || '—'}</td>
+                          <td className="px-5 py-3" style={{ color: '#3D2B1F' }}>
+                            {item.price ? `$${item.price.toFixed(2)}` : '—'}
+                          </td>
                           <td className="px-5 py-3" style={{ color: '#6B4F3A' }}>
-                            {item.potential_ingredients?.slice(0, 3).join(', ') || '—'}
+                            {item.potential_ingredients?.join(', ') || '—'}
                           </td>
                         </>
                       ) : (

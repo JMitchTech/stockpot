@@ -52,7 +52,7 @@ export default function Layout({ children }) {
         }}
       >
         <div className="px-6 py-3 flex items-center justify-between">
-          <img src={logo} alt="Stockpot" className="h-9" />
+          <img src={logo} alt="Stockpot" className="h-20" />
           <div className="flex items-center gap-4">
             <span className="text-sm" style={{ color: '#6B4F3A' }}>
               {user.email}
@@ -112,7 +112,7 @@ export default function Layout({ children }) {
             <img
               src={nonna}
               alt="Ask Nonna"
-              className="w-50 h-50 object-contain drop-shadow-lg"
+              className="w-45 h-45 object-contain drop-shadow-lg"
             />
             <span className="text-xs mt-1" style={{ color: '#6B4F3A' }}>
               Ask Nonna
